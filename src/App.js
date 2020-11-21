@@ -1,24 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import socketIOClient from 'socket.io-client';
+import React from 'react';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import Home from './Home';
+import Room from './Room';
 
 function App() {
-  const [response, setResponse] = useState('');
-
-  useEffect(() => {
-    const socket = socketIOClient();
-    socket.on('FromAPI', data => {
-      setResponse(data);
-    });
-
-    // CLEAN UP THE EFFECT
-    return () => socket.disconnect();
-    //
-  }, []);
-
   return (
-    <p>
-      It's <time dateTime={response}>{response}</time>
-    </p>
+    <Router>
+      <Switch>
+        <Route exact path="/" component={Home} />
+        <Route exact path="/:roomId" component={Room} />
+      </Switch>
+    </Router>
   );
 }
 
