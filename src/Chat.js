@@ -1,11 +1,15 @@
 import * as React from 'react';
-import { Modal } from 'semantic-ui-react';
+import { Form, TextArea, List } from 'semantic-ui-react';
 import useChat from './useChat';
 
-export function Chat({ props }) {
-  const { roomId } = props.match.params;
-  const { messages, sendMessage } = useChat(roomId);
+export function Chat({ socketRef }) {
+  const { messages, sendMessage } = useChat(socketRef);
   const [newMessage, setNewMessage] = React.useState('');
+  const messagesEndRef = React.createRef();
+
+  React.useEffect(() => {
+    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, messagesEndRef]);
 
   // value in message textarea
   const handleNewMessageChange = event => {
@@ -20,28 +24,44 @@ export function Chat({ props }) {
   };
 
   const handleSendMessage = () => {
-    sendMessage(newMessage, roomId);
+    sendMessage(newMessage);
     setNewMessage('');
   };
 
   return (
-    <React.Fragment>
-      <h1>Room: {roomId}</h1>
-      <div role="ol">
-        {messages.map((message, i) => (
-          <div role="li" key={i}>
-            <span style={{ color: 'red' }}>{message.senderAlias}</span>
-            <span style={{ marginLeft: '10px' }}>{message.body}</span>
-          </div>
-        ))}
+    <div
+      style={{
+        margin: '10px',
+      }}
+    >
+      <div
+        style={{
+          padding: '5px',
+          border: '1px dotted grey',
+          overflowY: 'scroll',
+          borderRadius: '5px',
+          height: '50vh',
+        }}
+      >
+        <List className="scrolling content">
+          {messages.map((message, i) => (
+            <List.Item key={i}>
+              <span style={{ color: 'red' }}>{message.senderAlias}</span>
+              <span style={{ marginLeft: '10px' }}>{message.body}</span>
+            </List.Item>
+          ))}
+          <div ref={messagesEndRef} />
+        </List>
       </div>
-      <textarea
-        value={newMessage}
-        onChange={handleNewMessageChange}
-        onKeyPress={pressEnter}
-        placeholder="Write message..."
-      />
-      <button onClick={handleSendMessage}>Send</button>
-    </React.Fragment>
+      <Form>
+        <TextArea
+          style={{ margin: '5px 0' }}
+          value={newMessage}
+          onChange={handleNewMessageChange}
+          onKeyPress={pressEnter}
+          placeholder="Write message..."
+        />
+      </Form>
+    </div>
   );
 }

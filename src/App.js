@@ -1,37 +1,29 @@
 import * as React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Menu, Button } from 'semantic-ui-react';
-
+import { AboutModal } from './AboutModal';
 import Home from './Home';
 import Room from './Room';
-import { AboutModal } from './AboutModal';
+import Name from './Name';
 
 function App() {
+  const [roomNameLabel, updateRoomNameLabel] = React.useState('');
   const [userName, setUserName] = React.useState(localStorage.getItem('userName'));
-  const [nameInput, setNameInput] = React.useState('');
+  const [color, setColor] = React.useState(localStorage.getItem('colorChoice'));
+
+  if (!color) {
+    const color = getRandomColor();
+    localStorage.setItem('colorChoice', color);
+    setColor(color);
+  }
   const [aboutModalOpen, updateAboutModalOpen] = React.useState(false);
-
-  const updateNameInput = evt => {
-    setNameInput(evt.target.value);
-  };
-
-  const clickButtonOkay = () => {
-    localStorage.setItem('userName', nameInput);
-    setUserName(nameInput);
-  };
-
-  const pressEnter = event => {
-    if (event.charCode === 13) {
-      event.preventDefault();
-      clickButtonOkay();
-    }
-  };
 
   return (
     <React.Fragment>
       <AboutModal aboutModalOpen={aboutModalOpen} updateAboutModalOpen={updateAboutModalOpen} />
       <Menu>
         <Menu.Item header>Pointing Poker</Menu.Item>
+        {roomNameLabel ? <Menu.Item header>Room: {roomNameLabel}</Menu.Item> : null}
         <Menu.Item position="right">
           <Button onClick={() => updateAboutModalOpen(true)}>About</Button>
         </Menu.Item>
@@ -39,20 +31,33 @@ function App() {
       {userName ? (
         <Router>
           <Switch>
-            <Route exact path="/" component={Home} />
-            <Route exact path="/:roomId" component={Room} />
+            <Route exact path="/" render={() => <Home />} />
+            <Route
+              exact
+              path="/:roomId"
+              render={props => (
+                <Room
+                  {...props}
+                  roomNameLabel={roomNameLabel}
+                  updateRoomNameLabel={updateRoomNameLabel}
+                />
+              )}
+            />
           </Switch>
         </Router>
       ) : (
-        <React.Fragment>
-          <input type="text" value={nameInput} onChange={updateNameInput} onKeyPress={pressEnter} />
-          <button disabled={!Boolean(nameInput)} onClick={() => clickButtonOkay()}>
-            OK
-          </button>
-        </React.Fragment>
+        <Name setUserName={setUserName} />
       )}
     </React.Fragment>
   );
 }
 
 export default App;
+
+function getRandomColor() {
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += Math.floor(Math.random() * 10);
+  }
+  return color;
+}

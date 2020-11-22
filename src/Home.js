@@ -1,25 +1,37 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import * as React from 'react';
+import { useHistory } from 'react-router-dom';
 
 const Home = () => {
-  const [roomName, setRoomName] = React.useState('');
+  const history = useHistory();
+  const [roomInput, setRoomInput] = React.useState('');
+
+  const handleOnClick = () => {
+    history.push(`/${roomInput}`);
+  };
 
   const handleRoomNameChange = event => {
-    setRoomName(event.target.value);
+    setRoomInput(event.target.value);
+  };
+
+  const pressEnter = event => {
+    if (event.charCode === 13) {
+      event.preventDefault();
+      handleOnClick();
+    }
   };
 
   return (
-    <div className="home-container">
+    <div>
       <input
         type="text"
         placeholder="Room"
-        value={roomName}
+        value={roomInput}
+        onKeyPress={pressEnter}
         onChange={handleRoomNameChange}
-        className="text-input-field"
       />
-      <Link to={`/${roomName}`} className="enter-room-button">
-        Join room
-      </Link>
+      <button disabled={!Boolean(roomInput)} onClick={() => handleOnClick()}>
+        OK
+      </button>
     </div>
   );
 };

@@ -1,17 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import socketIOClient from 'socket.io-client';
+import * as React from 'react';
 
 const NEW_CHAT_MESSAGE_EVENT = 'newChatMessage';
 
-const useChat = roomId => {
-  const [messages, setMessages] = useState([]);
-  const socketRef = useRef();
+const useChat = socketRef => {
+  const [messages, setMessages] = React.useState([]);
 
-  useEffect(() => {
-    socketRef.current = socketIOClient(null, {
-      query: { roomId },
-    });
-
+  React.useEffect(() => {
     socketRef.current.on(NEW_CHAT_MESSAGE_EVENT, message => {
       const incomingMessage = {
         ...message,
@@ -19,11 +13,7 @@ const useChat = roomId => {
       };
       setMessages(messages => [...messages, incomingMessage]);
     });
-
-    return () => {
-      socketRef.current.disconnect();
-    };
-  }, [roomId]);
+  }, []);
 
   const sendMessage = messageBody => {
     socketRef.current.emit(NEW_CHAT_MESSAGE_EVENT, {

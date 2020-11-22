@@ -1,10 +1,8 @@
-import React from 'react';
-import { Modal } from 'semantic-ui-react';
+import * as React from 'react';
 import useGame from './useGame';
 
-export function Game({ props }) {
-  const { roomId } = props.match.params;
-  const { messages, sendMessage } = useGame(roomId);
+export function Game({ socketRef }) {
+  const { messages, sendMessage } = useGame(socketRef);
 
   return <div>Game</div>;
 }

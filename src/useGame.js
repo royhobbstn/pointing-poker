@@ -1,32 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
-import socketIOClient from 'socket.io-client';
+import * as React from 'react';
 
-const NEW_CHAT_MESSAGE_EVENT = 'newChatMessage';
+const NEW_GAME_MESSAGE_EVENT = 'newGameMessage';
 
-const useGame = roomId => {
-  const [messages, setMessages] = useState([]);
-  const socketRef = useRef();
+const useGame = socketRef => {
+  const [messages, setMessages] = React.useState([]);
 
-  useEffect(() => {
-    socketRef.current = socketIOClient(null, {
-      query: { roomId },
-    });
-
-    socketRef.current.on(NEW_CHAT_MESSAGE_EVENT, message => {
+  React.useEffect(() => {
+    socketRef.current.on(NEW_GAME_MESSAGE_EVENT, message => {
       const incomingMessage = {
         ...message,
         ownedByCurrentUser: message.senderId === socketRef.current.id,
       };
       setMessages(messages => [...messages, incomingMessage]);
     });
-
-    return () => {
-      socketRef.current.disconnect();
-    };
-  }, [roomId]);
+  }, []);
 
   const sendMessage = messageBody => {
-    socketRef.current.emit(NEW_CHAT_MESSAGE_EVENT, {
+    socketRef.current.emit(NEW_GAME_MESSAGE_EVENT, {
       body: messageBody,
       senderId: socketRef.current.id,
       senderAlias: window.localStorage.userName,
