@@ -17,6 +17,9 @@ export function Chat({ socketRef }) {
   };
 
   const pressEnter = event => {
+    if (!newMessage.trim()) {
+      return;
+    }
     if (event.charCode === 13) {
       event.preventDefault();
       handleSendMessage();
@@ -37,7 +40,7 @@ export function Chat({ socketRef }) {
       <div
         style={{
           padding: '5px',
-          border: '1px dotted grey',
+          border: '1px solid lightgrey',
           overflowY: 'scroll',
           borderRadius: '5px',
           height: '50vh',
@@ -46,8 +49,12 @@ export function Chat({ socketRef }) {
         <List className="scrolling content">
           {messages.map((message, i) => (
             <List.Item key={i}>
-              <span style={{ color: 'red' }}>{message.senderAlias}</span>
-              <span style={{ marginLeft: '10px' }}>{message.body}</span>
+              <span style={getMessageNameStyle(message)}>
+                {message.senderAlias && `${message.senderAlias}: `}
+              </span>
+              <span style={{ marginLeft: '10px', ...getMessageTextStyle(message) }}>
+                {message.body}
+              </span>
             </List.Item>
           ))}
           <div ref={messagesEndRef} />
@@ -64,4 +71,16 @@ export function Chat({ socketRef }) {
       </Form>
     </div>
   );
+}
+
+function getMessageNameStyle(message) {
+  console.log(message);
+  return { color: message.colorChoice, fontWeight: 'bold' };
+}
+
+function getMessageTextStyle(message) {
+  if (!message.senderAlias) {
+    return { color: 'dimgrey', fontStyle: 'italic' };
+  }
+  return { color: 'darkslategrey' };
 }

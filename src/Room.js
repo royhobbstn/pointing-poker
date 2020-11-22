@@ -10,7 +10,7 @@ const Room = ({ match, roomNameLabel, updateRoomNameLabel }) => {
 
   React.useEffect(() => {
     socketRef.current = socketIOClient({
-      query: { roomName },
+      query: { roomName, alias: localStorage.getItem('userName') },
     });
 
     return () => {

@@ -13,7 +13,7 @@ const useGame = socketRef => {
       };
       setMessages(messages => [...messages, incomingMessage]);
     });
-  }, []);
+  }, [socketRef]);
 
   const sendMessage = messageBody => {
     socketRef.current.emit(NEW_GAME_MESSAGE_EVENT, {

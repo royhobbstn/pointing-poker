@@ -13,13 +13,14 @@ const useChat = socketRef => {
       };
       setMessages(messages => [...messages, incomingMessage]);
     });
-  }, []);
+  }, [socketRef]);
 
   const sendMessage = messageBody => {
     socketRef.current.emit(NEW_CHAT_MESSAGE_EVENT, {
       body: messageBody,
       senderId: socketRef.current.id,
-      senderAlias: window.localStorage.userName,
+      senderAlias: localStorage.getItem('userName'),
+      colorChoice: localStorage.getItem('colorChoice'),
     });
   };
 
