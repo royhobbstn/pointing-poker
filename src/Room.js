@@ -1,47 +1,20 @@
 import React from 'react';
-import useChat from './useChat';
+import { Grid } from 'semantic-ui-react';
+import { Game } from './Game';
+import { Chat } from './Chat';
 
 const Room = props => {
-  const { roomId } = props.match.params;
-  const { messages, sendMessage } = useChat(roomId);
-  const [newMessage, setNewMessage] = React.useState('');
-
-  const handleNewMessageChange = event => {
-    setNewMessage(event.target.value);
-  };
-
-  const handleSendMessage = () => {
-    sendMessage(newMessage);
-    setNewMessage('');
-  };
-
   return (
-    <div className="chat-room-container">
-      <h1 className="room-name">Room: {roomId}</h1>
-      <div className="messages-container">
-        <ol className="messages-list">
-          {messages.map((message, i) => (
-            <li
-              key={i}
-              className={`message-item ${
-                message.ownedByCurrentUser ? 'my-message' : 'received-message'
-              }`}
-            >
-              {message.body}
-            </li>
-          ))}
-        </ol>
-      </div>
-      <textarea
-        value={newMessage}
-        onChange={handleNewMessageChange}
-        placeholder="Write message..."
-        className="new-message-input-field"
-      />
-      <button onClick={handleSendMessage} className="send-message-button">
-        Send
-      </button>
-    </div>
+    <Grid>
+      <Grid.Row>
+        <Grid.Column width={8}>
+          <Game props={props} />
+        </Grid.Column>
+        <Grid.Column width={8}>
+          <Chat props={props} />
+        </Grid.Column>
+      </Grid.Row>
+    </Grid>
   );
 };
 

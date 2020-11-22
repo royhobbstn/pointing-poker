@@ -3,7 +3,7 @@ import socketIOClient from 'socket.io-client';
 
 const NEW_CHAT_MESSAGE_EVENT = 'newChatMessage';
 
-const useChat = roomId => {
+const useGame = roomId => {
   const [messages, setMessages] = useState([]);
   const socketRef = useRef();
 
@@ -36,4 +36,4 @@ const useChat = roomId => {
   return { messages, sendMessage };
 };
 
-export default useChat;
+export default useGame;
