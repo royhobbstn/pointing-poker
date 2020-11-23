@@ -15,6 +15,7 @@ const Room = ({ match, roomNameLabel, updateRoomNameLabel }) => {
 
     return () => {
       socketRef.current.disconnect();
+      socketRef.current.removeAllListeners();
     };
   }, [roomName]);
 
