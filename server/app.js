@@ -24,7 +24,12 @@ io.on('connection', socket => {
   // if room doesn't exist.  set it up.
   if (!roomData[roomName]) {
     roomData[roomName] = {};
-    roomData[roomName].aliases = {};
+    const room = roomData[roomName];
+    room.lastModified = Date.now(); // unix timestamp
+    room.aliases = {}; // { socketId: alias }
+    room.players = []; // array of socketIds
+    room.selections = {}; // {socketId: value, socketId: value},
+    room.mode = 'hidden'; // 'revealed' | 'hidden'
   }
 
   roomData[roomName].aliases[socket.id] = alias;
