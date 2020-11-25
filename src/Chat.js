@@ -44,13 +44,14 @@ export function Chat({ socketRef }) {
           overflowY: 'scroll',
           borderRadius: '5px',
           height: '50vh',
+          backgroundColor: 'white',
         }}
       >
         <List className="scrolling content">
           {messages.map((message, i) => (
             <List.Item key={i}>
               <span style={getMessageNameStyle(message)}>
-                {message.senderAlias && `${message.senderAlias}: `}
+                {message.userName && `${message.userName}: `}
               </span>
               <span style={{ marginLeft: '10px', ...getMessageTextStyle(message) }}>
                 {message.body}
@@ -79,7 +80,7 @@ function getMessageNameStyle(message) {
 }
 
 function getMessageTextStyle(message) {
-  if (!message.senderAlias) {
+  if (!message.userName) {
     return { color: 'dimgrey', fontStyle: 'italic' };
   }
   return { color: 'darkslategrey' };

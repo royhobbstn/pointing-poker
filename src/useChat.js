@@ -19,7 +19,8 @@ const useChat = socketRef => {
     socketRef.current.emit(NEW_CHAT_MESSAGE_EVENT, {
       body: messageBody,
       senderId: socketRef.current.id,
-      senderAlias: localStorage.getItem('userName'),
+      userName: localStorage.getItem('userName'),
+      userRole: localStorage.getItem('userRole'),
       colorChoice: localStorage.getItem('colorChoice'),
     });
   };

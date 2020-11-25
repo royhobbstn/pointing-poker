@@ -6,11 +6,20 @@ import socketIOClient from 'socket.io-client';
 
 const Room = ({ match, roomNameLabel, updateRoomNameLabel }) => {
   const socketRef = React.useRef();
+  const [socketReady, updateSocketReady] = React.useState(false);
   const roomName = match.params.roomId;
 
   React.useEffect(() => {
     socketRef.current = socketIOClient({
-      query: { roomName, alias: localStorage.getItem('userName') },
+      query: {
+        roomName,
+        userName: localStorage.getItem('userName'),
+        colorChoice: localStorage.getItem('colorChoice'),
+        userRole: localStorage.getItem('userRole'),
+      },
+    });
+    socketRef.current.on('connect', function () {
+      updateSocketReady(true);
     });
 
     return () => {
@@ -28,7 +37,7 @@ const Room = ({ match, roomNameLabel, updateRoomNameLabel }) => {
 
   return (
     <Grid>
-      {socketRef.current ? (
+      {socketReady ? (
         <Grid.Row>
           <Grid.Column width={9}>
             <Game socketRef={socketRef} />

@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Button } from 'semantic-ui-react';
+import { Button, Icon } from 'semantic-ui-react';
 
-export function GameRow({ color, selection, alias, isYou, mode }) {
+export function GameRow({ color, selection, alias, isYou, mode, updateSelectedValue }) {
   console.log({ color, selection, alias, isYou, mode });
   return (
     <div>
@@ -16,62 +16,41 @@ export function GameRow({ color, selection, alias, isYou, mode }) {
         >
           {alias}
         </span>
-        {selection === 'selected' ? (
+        <Icon
+          style={{
+            color: selection === 'unselected' ? 'grey' : 'green',
+          }}
+          disabled={selection === 'unselected'}
+          name="star outline"
+        />
+        {isYou === false ? (
           <Button.Group basic size="small">
-            <Button className="btngrp-bar" disabled color="green">
-              1
-            </Button>
-            <Button className="btngrp-bar" disabled style={{ color: 'orange' }}>
-              2
-            </Button>
-            <Button className="btngrp-bar" disabled style={{ color: 'orange' }}>
-              3
-            </Button>
-            <Button className="btngrp-bar">5</Button>
-            <Button className="btngrp-bar">8</Button>
-            <Button className="btngrp-bar">13</Button>
-            <Button className="btngrp-bar">21</Button>
-            <Button className="btngrp-bar">40</Button>
-            <Button className="btngrp-bar">80</Button>
+            <Button.Group basic size="small">
+              {['1', '2', '3', '5', '8', '13', '21', '40', '80'].map(num => {
+                return (
+                  <Button className="btngrp-bar" disabled basic key={num}>
+                    {num}
+                  </Button>
+                );
+              })}
+            </Button.Group>
           </Button.Group>
         ) : null}
-        {selection === 'unselected' ? (
+        {isYou === true ? (
           <Button.Group basic size="small">
-            <Button className="btngrp-bar">1</Button>
-            <Button className="btngrp-bar">2</Button>
-            <Button className="btngrp-bar">3</Button>
-            <Button className="btngrp-bar">5</Button>
-            <Button className="btngrp-bar">8</Button>
-            <Button className="btngrp-bar">13</Button>
-            <Button className="btngrp-bar">21</Button>
-            <Button className="btngrp-bar">40</Button>
-            <Button className="btngrp-bar">80</Button>
-          </Button.Group>
-        ) : null}
-        {selection !== 'unselected' && selection !== 'selected' && isYou === false ? (
-          <Button.Group basic size="small">
-            <Button className="btngrp-bar">1</Button>
-            <Button className="btngrp-bar">2</Button>
-            <Button className="btngrp-bar">3</Button>
-            <Button className="btngrp-bar">5</Button>
-            <Button className="btngrp-bar">8</Button>
-            <Button className="btngrp-bar">13</Button>
-            <Button className="btngrp-bar">21</Button>
-            <Button className="btngrp-bar">40</Button>
-            <Button className="btngrp-bar">80</Button>
-          </Button.Group>
-        ) : null}
-        {selection !== 'unselected' && selection !== 'selected' && isYou === true ? (
-          <Button.Group basic size="small">
-            <Button className="btngrp-bar">1</Button>
-            <Button className="btngrp-bar">2</Button>
-            <Button className="btngrp-bar">3</Button>
-            <Button className="btngrp-bar">5</Button>
-            <Button className="btngrp-bar">8</Button>
-            <Button className="btngrp-bar">13</Button>
-            <Button className="btngrp-bar">21</Button>
-            <Button className="btngrp-bar">40</Button>
-            <Button className="btngrp-bar">80</Button>
+            {['1', '2', '3', '5', '8', '13', '21', '40', '80'].map(num => {
+              return (
+                <Button
+                  key={num}
+                  className="btngrp-bar"
+                  basic
+                  primary={selection === num}
+                  onClick={() => updateSelectedValue(num)}
+                >
+                  {num}
+                </Button>
+              );
+            })}
           </Button.Group>
         ) : null}
       </div>
