@@ -2,4 +2,4 @@
 
 Pointing Poker without connectivity issues.
 
-URL:
+URL: https://pointing-poker-ws.herokuapp.com/mpm

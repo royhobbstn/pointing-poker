@@ -2,13 +2,19 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const helmet = require('helmet');
+const path = require('path');
 
 const port = process.env.PORT || 4000;
 
 const app = express();
+app.use(helmet());
 
 app.use(express.static('build'));
-app.use(helmet());
+
+// Express serve up index.html file if it doesn't recognize route
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
+});
 
 const server = http.createServer(app);
 const io = socketIo(server);
