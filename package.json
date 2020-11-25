@@ -15,7 +15,11 @@
     "semantic-ui-react": "^2.0.1",
     "socket.io-client": "^3.0.3",
     "uuid": "^8.3.1",
-    "web-vitals": "^0.2.4"
+    "web-vitals": "^0.2.4",
+    "express": "^4.17.1",
+    "helmet": "^4.2.0",
+    "prettier": "^2.2.0",
+    "socket.io": "^3.0.3"
   },
   "proxy": "http://localhost:4000",
   "scripts": {
@@ -42,11 +46,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "express": "^4.17.1",
-    "helmet": "^4.2.0",
-    "prettier": "^2.2.0",
-    "socket.io": "^3.0.3"
   }
 }
