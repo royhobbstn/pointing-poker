@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { GameRow } from './GameRow.js';
 import useGame from './useGame';
-import { Button } from 'semantic-ui-react';
+import { Button, Checkbox } from 'semantic-ui-react';
 
 export function Game({ socketRef }) {
   const { gameData, sendMessage } = useGame(socketRef);
@@ -19,14 +19,17 @@ export function Game({ socketRef }) {
   });
 
   function showAll() {
-    sendMessage('showAll', null);
+    sendMessage('showAll', !gameData.showAll);
+  }
+
+  function clearAll() {
+    sendMessage('clearAll', null);
   }
 
   function updateSelectedValue(value) {
     sendMessage('updateSelectedValue', value);
   }
 
-  console.log({ gameData });
   return (
     <div style={{ margin: '14px 0 14px 24px' }}>
       {developers.length ? (
@@ -42,6 +45,7 @@ export function Game({ socketRef }) {
                   alias={gameData.aliases[player]}
                   isYou={player === socketRef.current.id}
                   mode={gameData.mode}
+                  showAll={gameData.showAll}
                   updateSelectedValue={updateSelectedValue}
                 />
               );
@@ -63,6 +67,7 @@ export function Game({ socketRef }) {
                   alias={gameData.aliases[player]}
                   isYou={player === socketRef.current.id}
                   mode={gameData.mode}
+                  showAll={gameData.showAll}
                   updateSelectedValue={updateSelectedValue}
                 />
               );
@@ -72,8 +77,17 @@ export function Game({ socketRef }) {
       ) : null}
 
       <div>
-        <Button>Clear</Button>
-        {gameData.mode === 'hidden' ? <Button onClick={() => showAll()}>Show</Button> : null}
+        <Button onClick={() => clearAll()}>Clear Everyone</Button>
+        <br />
+        <br />
+        <br />
+        {gameData.mode === 'hidden' ? (
+          <Checkbox
+            label="Force Show Everyone"
+            onChange={() => showAll()}
+            checked={gameData.showAll}
+          />
+        ) : null}
       </div>
     </div>
   );

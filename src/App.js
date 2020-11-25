@@ -5,11 +5,12 @@ import Room from './Room';
 import MainMenu from './MainMenu';
 
 function App() {
+  const socketRef = React.useRef(null);
   const [roomNameLabel, updateRoomNameLabel] = React.useState('');
 
   return (
     <React.Fragment>
-      <MainMenu roomNameLabel={roomNameLabel} />
+      <MainMenu roomNameLabel={roomNameLabel} socketRef={socketRef} />
       <Router>
         <Switch>
           <Route exact path="/" render={() => <Home />} />
@@ -21,6 +22,7 @@ function App() {
                 {...props}
                 roomNameLabel={roomNameLabel}
                 updateRoomNameLabel={updateRoomNameLabel}
+                socketRef={socketRef}
               />
             )}
           />

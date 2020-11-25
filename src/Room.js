@@ -4,8 +4,7 @@ import { Game } from './Game';
 import { Chat } from './Chat';
 import socketIOClient from 'socket.io-client';
 
-const Room = ({ match, roomNameLabel, updateRoomNameLabel }) => {
-  const socketRef = React.useRef();
+const Room = ({ match, roomNameLabel, updateRoomNameLabel, socketRef }) => {
   const [socketReady, updateSocketReady] = React.useState(false);
   const roomName = match.params.roomId;
 
@@ -20,6 +19,8 @@ const Room = ({ match, roomNameLabel, updateRoomNameLabel }) => {
     });
     socketRef.current.on('connect', function () {
       updateSocketReady(true);
+      // here send message to server to tell it to announce connection to everyone and send updated game state.
+      socketRef.current.emit('announceConnection', null);
     });
 
     return () => {

@@ -75,7 +75,6 @@ export function Chat({ socketRef }) {
 }
 
 function getMessageNameStyle(message) {
-  console.log(message);
   return { color: message.colorChoice, fontWeight: 'bold' };
 }
 

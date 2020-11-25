@@ -25,62 +25,80 @@ io.on('connection', socket => {
     const room = roomData[roomName];
     room.lastModified = Date.now(); // unix timestamp
     room.aliases = {}; // { socketId: alias }
-    room.colors = {};
-    room.roles = {};
+    room.colors = {}; // {socketId: #hex },
+    room.roles = {}; // {socketId: developer | tester | observer},
     room.players = []; // array of socketIds
     room.selections = {}; // {socketId: value, socketId: value},
     room.mode = 'hidden'; // 'revealed' | 'hidden'
+    room.showAll = false; // boolean
   }
 
-  // okay here, not okay everywhere else
+  // initial setup for a newly connected player
   roomData[roomName].aliases[socket.id] = userName;
   roomData[roomName].colors[socket.id] = colorChoice;
   roomData[roomName].roles[socket.id] = userRole;
+  roomData[roomName].selections[socket.id] = 'unselected';
   roomData[roomName].players.push(socket.id);
-
-  // new player, say hello everyone!
-  console.log('emitting!');
-  console.log(Date.now());
-  io.in(roomName).emit('gameData', roomData[roomName]);
-
-  io.in(roomName).emit(CHAT, {
-    body: `${roomData[roomName].aliases[socket.id]} has connected`,
-    senderId: '', // blank here indicates moderator italic grey text in chat room
-    userName: '',
-    userRole: '',
-    colorChoice: '',
-  });
 
   // Listen for new messages
   socket.on(CHAT, message => {
-    // temp
-    roomData[roomName].aliases[socket.id] = message.userName;
-    roomData[roomName].colors[socket.id] = message.colorChoice;
-    roomData[roomName].roles[socket.id] = message.userRole;
-    // --
     roomData[roomName].lastModified = Date.now();
     io.in(roomName).emit(CHAT, message);
   });
 
+  socket.on('announceConnection', message => {
+    // new player, say hello everyone!
+    io.in(roomName).emit(CHAT, {
+      body: `${roomData[roomName].aliases[socket.id]} has connected`,
+      senderId: '', // blank here indicates moderator italic grey text in chat room
+    });
+
+    // update everyones game data (mostly for newly connected user)
+    roomData[roomName].lastModified = Date.now();
+    io.in(roomName).emit('gameData', roomData[roomName]);
+  });
+
   socket.on('showAll', message => {
-    // temp
+    roomData[roomName].lastModified = Date.now();
+    roomData[roomName].showAll = message.body;
+    io.in(roomName).emit('gameData', roomData[roomName]);
+  });
+
+  socket.on('clearAll', () => {
+    roomData[roomName].lastModified = Date.now();
+    roomData[roomName].mode = 'hidden';
+    roomData[roomName].showAll = false;
+    Object.keys(roomData[roomName].selections).forEach(key => {
+      roomData[roomName].selections[key] = 'unselected';
+    });
+    io.in(roomName).emit('gameData', roomData[roomName]);
+  });
+
+  socket.on('updateSettings', message => {
     roomData[roomName].aliases[socket.id] = message.userName;
     roomData[roomName].colors[socket.id] = message.colorChoice;
     roomData[roomName].roles[socket.id] = message.userRole;
-    // --
-    roomData[roomName].lastModified = Date.now();
-    roomData[roomName].mode = 'revealed';
     io.in(roomName).emit('gameData', roomData[roomName]);
   });
 
   socket.on('updateSelectedValue', message => {
-    // temp
-    roomData[roomName].aliases[socket.id] = message.userName;
-    roomData[roomName].colors[socket.id] = message.colorChoice;
-    roomData[roomName].roles[socket.id] = message.userRole;
-    // --
     roomData[roomName].lastModified = Date.now();
-    roomData[roomName].selections[socket.id] = message.body;
+    if (roomData[roomName].selections[socket.id] === message.body) {
+      roomData[roomName].selections[socket.id] = 'unselected';
+    } else {
+      roomData[roomName].selections[socket.id] = message.body;
+    }
+
+    // figure out if this trigges SHOW (if everyone has selected)
+    const allPicked = roomData[roomName].players.every(player => {
+      return roomData[roomName].selections[player] !== 'unselected';
+    });
+    if (allPicked) {
+      roomData[roomName].mode = 'revealed';
+    }
+
+    // calc stats for everyone
+
     io.in(roomName).emit('gameData', roomData[roomName]);
   });
 
@@ -92,9 +110,6 @@ io.on('connection', socket => {
     io.in(roomName).emit(CHAT, {
       body: `${roomData[roomName].aliases[socket.id]} has disconnected`,
       senderId: '', // blank here indicates moderator italic grey text in chat room
-      userName: '',
-      userRole: '',
-      colorChoice: '',
     });
     io.in(roomName).emit('gameData', roomData[roomName]);
 

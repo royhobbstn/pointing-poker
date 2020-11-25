@@ -3,7 +3,7 @@ import Settings from './Settings';
 import { AboutModal } from './AboutModal';
 import { Menu, Button, Icon, Header } from 'semantic-ui-react';
 
-const MainMenu = ({ roomNameLabel }) => {
+const MainMenu = ({ roomNameLabel, socketRef }) => {
   const [aboutModalOpen, updateAboutModalOpen] = React.useState(false);
   const [settingsAreVisible, updateSettingsAreVisible] = React.useState(false);
 
@@ -22,6 +22,7 @@ const MainMenu = ({ roomNameLabel }) => {
       <Settings
         settingsAreVisible={settingsAreVisible}
         updateSettingsAreVisible={updateSettingsAreVisible}
+        socketRef={socketRef}
       />
       <Menu>
         <Menu.Item header>

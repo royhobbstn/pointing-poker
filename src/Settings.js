@@ -2,32 +2,33 @@ import * as React from 'react';
 import { Input, Button, Checkbox, Grid, Modal, Form } from 'semantic-ui-react';
 import { ChromePicker } from 'react-color';
 
-const Name = ({ settingsAreVisible, updateSettingsAreVisible }) => {
-  const [nameInput, setNameInput] = React.useState(localStorage.getItem('userName'));
-  const [roleValue, setRoleValue] = React.useState(localStorage.getItem('userRole'));
-  const [colorValue, setColorValue] = React.useState(localStorage.getItem('colorChoice'));
+const Name = ({ settingsAreVisible, updateSettingsAreVisible, socketRef }) => {
+  const [userName, updateUserName] = React.useState(localStorage.getItem('userName'));
+  const [userRole, updateUserRole] = React.useState(localStorage.getItem('userRole'));
+  const [colorChoice, updateColorChoice] = React.useState(localStorage.getItem('colorChoice'));
   const [colorPickerVisible, setColorPickerVisible] = React.useState(false);
 
-  if (!colorValue) {
+  if (!colorChoice) {
     const color = getRandomColor();
     localStorage.setItem('colorChoice', color);
-    setColorValue(color);
+    updateColorChoice(color);
   }
 
-  if (!roleValue) {
+  if (!userRole) {
     localStorage.setItem('userRole', 'developer');
-    setRoleValue('developer');
+    updateUserRole('developer');
   }
 
   const updateNameInput = evt => {
-    setNameInput(evt.target.value);
+    updateUserName(evt.target.value);
   };
 
   const clickButtonOkay = () => {
-    localStorage.setItem('userName', nameInput);
-    localStorage.setItem('userRole', roleValue);
-    localStorage.setItem('colorChoice', colorValue);
+    localStorage.setItem('userName', userName);
+    localStorage.setItem('userRole', userRole);
+    localStorage.setItem('colorChoice', colorChoice);
     updateSettingsAreVisible(false);
+    socketRef.current.emit('updateSettings', { userName, userRole, colorChoice });
   };
 
   const pressEnter = event => {
@@ -50,9 +51,10 @@ const Name = ({ settingsAreVisible, updateSettingsAreVisible }) => {
         }}
       >
         <Input
+          label="Username: "
           type="text"
           placeholder="Enter a User Name"
-          value={nameInput}
+          value={userName}
           onChange={updateNameInput}
           onKeyPress={pressEnter}
         />
@@ -69,8 +71,8 @@ const Name = ({ settingsAreVisible, updateSettingsAreVisible }) => {
                         label="Developer"
                         name="checkboxRadioGroup"
                         value="developer"
-                        checked={roleValue === 'developer'}
-                        onChange={() => setRoleValue('developer')}
+                        checked={userRole === 'developer'}
+                        onChange={() => updateUserRole('developer')}
                       />
                     </Form.Field>
                     <Form.Field>
@@ -79,8 +81,8 @@ const Name = ({ settingsAreVisible, updateSettingsAreVisible }) => {
                         label="Test / QA"
                         name="checkboxRadioGroup"
                         value="tester"
-                        checked={roleValue === 'tester'}
-                        onChange={() => setRoleValue('tester')}
+                        checked={userRole === 'tester'}
+                        onChange={() => updateUserRole('tester')}
                       />
                     </Form.Field>
                     <Form.Field>
@@ -89,8 +91,8 @@ const Name = ({ settingsAreVisible, updateSettingsAreVisible }) => {
                         label="Observer"
                         name="checkboxRadioGroup"
                         value="observer"
-                        checked={roleValue === 'observer'}
-                        onChange={() => setRoleValue('observer')}
+                        checked={userRole === 'observer'}
+                        onChange={() => updateUserRole('observer')}
                       />
                     </Form.Field>
                   </Form>
@@ -105,15 +107,15 @@ const Name = ({ settingsAreVisible, updateSettingsAreVisible }) => {
                         display: 'block',
                         width: '30px',
                         height: '20px',
-                        backgroundColor: colorValue,
+                        backgroundColor: colorChoice,
                       }}
                     ></span>
                   </Button>
                   {colorPickerVisible ? (
                     <div style={{ position: 'absolute', float: 'right', zIndex: '500' }}>
                       <ChromePicker
-                        color={colorValue}
-                        onChangeComplete={c => setColorValue(c.hex)}
+                        color={colorChoice}
+                        onChangeComplete={c => updateColorChoice(c.hex)}
                       />
                     </div>
                   ) : null}
@@ -124,7 +126,7 @@ const Name = ({ settingsAreVisible, updateSettingsAreVisible }) => {
         </div>
       </div>
       <Modal.Actions>
-        <Button disabled={!Boolean(nameInput)} onClick={() => clickButtonOkay()}>
+        <Button disabled={!Boolean(userName)} onClick={() => clickButtonOkay()}>
           OK
         </Button>
       </Modal.Actions>
