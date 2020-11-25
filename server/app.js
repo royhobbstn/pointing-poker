@@ -12,9 +12,9 @@ app.use(helmet());
 app.use(express.static('build'));
 
 // Express serve up index.html file if it doesn't recognize route
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve('build', 'index.html'));
-});
+// app.get('/*', (req, res) => {
+//   res.sendFile(path.resolve('build', 'index.html'));
+// });
 
 const server = http.createServer(app);
 const io = socketIo(server);
