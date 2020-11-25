@@ -28,15 +28,13 @@ export function GameRow({ color, selection, alias, isYou, mode, updateSelectedVa
 
         {isYou === false && mode !== 'revealed' && !showAll ? (
           <Button.Group basic size="small">
-            <Button.Group basic size="small">
-              {['1', '2', '3', '5', '8', '13', '21', '40', '80'].map(num => {
-                return (
-                  <Button className="btngrp-bar" disabled basic key={num}>
-                    {num}
-                  </Button>
-                );
-              })}
-            </Button.Group>
+            {['1', '2', '3', '5', '8', '13', '21', '40', '80'].map(num => {
+              return (
+                <Button key={num} className="btngrp-bar" disabled basic>
+                  {num}
+                </Button>
+              );
+            })}
           </Button.Group>
         ) : null}
         {isYou === true || mode === 'revealed' || showAll ? (
