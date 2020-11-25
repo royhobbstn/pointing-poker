@@ -13,7 +13,7 @@ app.use(express.static('build'));
 
 // Express serve up index.html file if it doesn't recognize route
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
+  res.sendFile(path.resolve('build', 'index.html'));
 });
 
 const server = http.createServer(app);
