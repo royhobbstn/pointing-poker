@@ -40,10 +40,10 @@ const Room = ({ match, roomNameLabel, updateRoomNameLabel, socketRef }) => {
     <Grid>
       {socketReady ? (
         <Grid.Row>
-          <Grid.Column width={9}>
+          <Grid.Column width={10}>
             <Game socketRef={socketRef} />
           </Grid.Column>
-          <Grid.Column width={7}>
+          <Grid.Column width={6}>
             <Chat socketRef={socketRef} />
           </Grid.Column>
         </Grid.Row>

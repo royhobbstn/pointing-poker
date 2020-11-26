@@ -46,7 +46,6 @@ io.on('connection', socket => {
   roomData[roomName].colors[socket.id] = colorChoice;
   roomData[roomName].roles[socket.id] = userRole;
   roomData[roomName].selections[socket.id] = 'unselected';
-  roomData[roomName].players.push(socket.id);
 
   // Listen for new messages
   socket.on(CHAT, message => {
@@ -57,14 +56,20 @@ io.on('connection', socket => {
   socket.on('announceConnection', () => {
     roomData[roomName].lastModified = Date.now();
 
+    // officially add player
+    roomData[roomName].players.push(socket.id);
+
+    // a new non-observer user may push this back into hidden state
+    roomData[roomName].mode = figureRevealed(roomData[roomName]) ? 'revealed' : 'hidden';
+
+    // update everyones game data (mostly for newly connected user)
+    sendToEveryone(io, roomName, addStats(roomData[roomName]));
+
     // new player, say hello everyone!
     io.in(roomName).emit(CHAT, {
       body: `${roomData[roomName].aliases[socket.id]} has connected`,
       senderId: '', // blank here indicates moderator italic grey text in chat room
     });
-
-    // update everyones game data (mostly for newly connected user)
-    sendToEveryone(io, roomName, addStats(roomData[roomName]));
   });
 
   socket.on('showAll', message => {
@@ -107,6 +112,7 @@ io.on('connection', socket => {
     }
 
     roomData[roomName].colors[socket.id] = message.colorChoice;
+    roomData[roomName].mode = figureRevealed(roomData[roomName]) ? 'revealed' : 'hidden';
 
     sendToEveryone(io, roomName, addStats(roomData[roomName]));
   });
@@ -119,13 +125,7 @@ io.on('connection', socket => {
       roomData[roomName].selections[socket.id] = message.body;
     }
 
-    // figure out if this trigges SHOW (if everyone has selected)
-    const allPicked = roomData[roomName].players.every(player => {
-      return roomData[roomName].selections[player] !== 'unselected';
-    });
-    if (allPicked) {
-      roomData[roomName].mode = 'revealed';
-    }
+    roomData[roomName].mode = figureRevealed(roomData[roomName]) ? 'revealed' : 'hidden';
 
     sendToEveryone(io, roomName, addStats(roomData[roomName]));
   });
@@ -136,6 +136,9 @@ io.on('connection', socket => {
 
     console.log(`Client ${socket.id} disconnected`);
     roomData[roomName].players = roomData[roomName].players.filter(d => d !== socket.id);
+
+    // a departing player may push this to revealed state
+    roomData[roomName].mode = figureRevealed(roomData[roomName]) ? 'revealed' : 'hidden';
 
     io.in(roomName).emit(CHAT, {
       body: `${roomData[roomName].aliases[socket.id]} has disconnected`,
@@ -170,6 +173,20 @@ function sendToEveryone(io, roomName, data) {
       io.to(player).emit('gameData', copy);
     }
   }
+}
+
+function figureRevealed(data) {
+  // figure out if this triggers 'revealed' (if everyone has selected)
+
+  return data.players.every(player => {
+    // if you are an observer, you dont factor into this
+    const role = data.roles[player];
+    if (role === 'observer') {
+      return true;
+    }
+
+    return data.selections[player] !== 'unselected';
+  });
 }
 
 function addStats(input) {

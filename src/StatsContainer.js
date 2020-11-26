@@ -14,18 +14,30 @@ const StatsContainer = ({ stats }) => {
           <span>Statistics</span>
         </Card.Meta>
         <div style={{ marginTop: '25px' }}>
-          <p style={{ width: '150px', display: 'inline-block' }}>Developer Average:</p>
-          <span style={{ fontWeight: 'bold' }}>{stats.developerAverage || '----'}</span>
+          <p style={{ width: '100%', maxWidth: '250px', display: 'inline-block' }}>
+            Developer Avg:{' '}
+            <span style={{ fontWeight: 'bold', float: 'right' }}>
+              {stats.developerAverage || '----'}
+            </span>
+          </p>
         </div>
 
         <div>
-          <p style={{ width: '150px', display: 'inline-block' }}>Tester Average:</p>
-          <span style={{ fontWeight: 'bold' }}>{stats.testerAverage || '----'}</span>
+          <p style={{ width: '100%', maxWidth: '250px', display: 'inline-block' }}>
+            Tester Avg:{' '}
+            <span style={{ fontWeight: 'bold', float: 'right' }}>
+              {stats.testerAverage || '----'}
+            </span>
+          </p>
         </div>
         <hr />
         <div>
-          <p style={{ width: '150px', display: 'inline-block' }}>Total Average:</p>
-          <span style={{ fontWeight: 'bold' }}>{stats.totalAverage || '----'}</span>
+          <p style={{ width: '100%', maxWidth: '250px', display: 'inline-block' }}>
+            Total Avg:{' '}
+            <span style={{ fontWeight: 'bold', float: 'right' }}>
+              {stats.totalAverage || '----'}
+            </span>
+          </p>
         </div>
       </Card.Content>
     </Card>

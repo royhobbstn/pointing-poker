@@ -35,7 +35,7 @@ export function Game({ socketRef }) {
     <div style={{ margin: '14px 0 14px 24px' }}>
       <Grid>
         <Grid.Row>
-          <Grid.Column width={10}>
+          <Grid.Column width={11}>
             {developers.length ? (
               <div style={{ margin: '20px 5px' }}>
                 <p style={{ margin: '0', fontWeight: 'bold' }}>DEVELOPERS</p>
@@ -95,7 +95,7 @@ export function Game({ socketRef }) {
               ) : null}
             </div>
           </Grid.Column>
-          <Grid.Column width={6}>
+          <Grid.Column width={5}>
             <StatsContainer stats={gameData.stats} />
           </Grid.Column>
         </Grid.Row>
