@@ -64,13 +64,14 @@ io.on('connection', socket => {
     });
 
     // update everyones game data (mostly for newly connected user)
-    io.in(roomName).emit('gameData', filterPrivate(roomData[roomName]));
+    sendToEveryone(io, roomName, addStats(roomData[roomName]));
   });
 
   socket.on('showAll', message => {
     roomData[roomName].lastModified = Date.now();
     roomData[roomName].showAll = message.body;
-    io.in(roomName).emit('gameData', filterPrivate(roomData[roomName]));
+    const withStats = addStats(roomData[roomName]);
+    io.in(roomName).emit('gameData', withStats);
   });
 
   socket.on('clearAll', () => {
@@ -80,7 +81,8 @@ io.on('connection', socket => {
     Object.keys(roomData[roomName].selections).forEach(key => {
       roomData[roomName].selections[key] = 'unselected';
     });
-    io.in(roomName).emit('gameData', filterPrivate(roomData[roomName]));
+    const withStats = addStats(roomData[roomName]);
+    io.in(roomName).emit('gameData', withStats);
   });
 
   socket.on('updateSettings', message => {
@@ -106,7 +108,7 @@ io.on('connection', socket => {
 
     roomData[roomName].colors[socket.id] = message.colorChoice;
 
-    io.in(roomName).emit('gameData', filterPrivate(roomData[roomName]));
+    sendToEveryone(io, roomName, addStats(roomData[roomName]));
   });
 
   socket.on('updateSelectedValue', message => {
@@ -125,8 +127,7 @@ io.on('connection', socket => {
       roomData[roomName].mode = 'revealed';
     }
 
-    // calc stats for everyone (mutate)
-    io.in(roomName).emit('gameData', filterPrivate(roomData[roomName]));
+    sendToEveryone(io, roomName, addStats(roomData[roomName]));
   });
 
   // Leave the room if the user closes the socket
@@ -141,8 +142,7 @@ io.on('connection', socket => {
       senderId: '', // blank here indicates moderator italic grey text in chat room
     });
 
-    // update Stats
-    io.in(roomName).emit('gameData', filterPrivate(roomData[roomName]));
+    sendToEveryone(io, roomName, addStats(roomData[roomName]));
 
     socket.leave(roomName);
   });
@@ -150,7 +150,29 @@ io.on('connection', socket => {
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
 
-function filterPrivate(input) {
+function sendToEveryone(io, roomName, data) {
+  if (data.mode === 'revealed' || data.showAll) {
+    io.in(roomName).emit('gameData', data);
+  } else {
+    // obscure selections so they cant peek at network tab traffic
+    for (let player of data.players) {
+      // copy this structure or else we're in a world of trouble
+      const copy = JSON.parse(JSON.stringify(data));
+      for (let selectionKey of Object.keys(copy.selections)) {
+        if (selectionKey !== player) {
+          const selection = copy.selections[selectionKey];
+          // a numeric value we will obscure by calling it 'selected'
+          if (selection !== 'selected' && selection !== 'unselected') {
+            copy.selections[selectionKey] = 'selected';
+          }
+        }
+      }
+      io.to(player).emit('gameData', copy);
+    }
+  }
+}
+
+function addStats(input) {
   const data = JSON.parse(JSON.stringify(input));
 
   if (data.mode === 'revealed' || data.showAll) {
@@ -185,8 +207,6 @@ function filterPrivate(input) {
   } else {
     data.stats = null;
   }
-
-  // TODO filter out data from other users
 
   return data;
 }
