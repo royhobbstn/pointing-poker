@@ -67,7 +67,7 @@ io.on('connection', socket => {
 
     // new player, say hello everyone!
     io.in(roomName).emit(CHAT, {
-      body: `${roomData[roomName].aliases[socket.id]} has connected`,
+      body: `${roomData[roomName].aliases[socket.id] || '--new user--'} has connected`,
       senderId: '', // blank here indicates moderator italic grey text in chat room
     });
   });
@@ -97,7 +97,7 @@ io.on('connection', socket => {
     if (oldUserName !== message.userName) {
       roomData[roomName].aliases[socket.id] = message.userName;
       io.in(roomName).emit(CHAT, {
-        body: `--${oldUserName}-- has changed their name to: --${message.userName}--`,
+        body: `--${oldUserName || 'new user'}-- has changed their name to: --${message.userName}--`,
         senderId: '', // blank here indicates moderator italic grey text in chat room
       });
     }
@@ -106,7 +106,9 @@ io.on('connection', socket => {
     if (oldRole !== message.userRole) {
       roomData[roomName].roles[socket.id] = message.userRole;
       io.in(roomName).emit(CHAT, {
-        body: `--${message.userName}-- has changed their role from: --${oldRole}-- to: --${message.userRole}--`,
+        body: `--${
+          message.userName || 'new user'
+        }-- has changed their role from: --${oldRole}-- to: --${message.userRole}--`,
         senderId: '', // blank here indicates moderator italic grey text in chat room
       });
     }
