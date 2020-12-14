@@ -65,11 +65,13 @@ io.on('connection', socket => {
     // update everyones game data (mostly for newly connected user)
     sendToEveryone(io, roomName, addStats(roomData[roomName]));
 
-    // new player, say hello everyone!
-    io.in(roomName).emit(CHAT, {
-      body: `${roomData[roomName].aliases[socket.id] || '--new user--'} has connected`,
-      senderId: '', // blank here indicates moderator italic grey text in chat room
-    });
+    // new player, say hello everyone! (only if they have a name)
+    if (roomData[roomName].aliases[socket.id] && roomData[roomName].aliases[socket.id] !== 'null') {
+      io.in(roomName).emit(CHAT, {
+        body: `${roomData[roomName].aliases[socket.id]} has connected`,
+        senderId: '', // blank here indicates moderator italic grey text in chat room
+      });
+    }
   });
 
   socket.on('showAll', message => {
@@ -96,10 +98,19 @@ io.on('connection', socket => {
     const oldUserName = roomData[roomName].aliases[socket.id];
     if (oldUserName !== message.userName) {
       roomData[roomName].aliases[socket.id] = message.userName;
-      io.in(roomName).emit(CHAT, {
-        body: `--${oldUserName || 'new user'}-- has changed their name to: --${message.userName}--`,
-        senderId: '', // blank here indicates moderator italic grey text in chat room
-      });
+      if (oldUserName && oldUserName !== 'null') {
+        io.in(roomName).emit(CHAT, {
+          body: `--${oldUserName || 'new user'}-- has changed their name to: --${
+            message.userName
+          }--`,
+          senderId: '', // blank here indicates moderator italic grey text in chat room
+        });
+      } else {
+        io.in(roomName).emit(CHAT, {
+          body: `${message.userName} has connected`,
+          senderId: '', // blank here indicates moderator italic grey text in chat room
+        });
+      }
     }
 
     const oldRole = roomData[roomName].roles[socket.id];

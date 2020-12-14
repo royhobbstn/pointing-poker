@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Input, Button, Checkbox, Grid, Modal, Form } from 'semantic-ui-react';
 import { ChromePicker } from 'react-color';
 
-const Name = ({ settingsAreVisible, updateSettingsAreVisible, socketRef }) => {
+const Settings = ({ settingsAreVisible, updateSettingsAreVisible, socketRef }) => {
   const [userName, updateUserName] = React.useState(localStorage.getItem('userName'));
   const [userRole, updateUserRole] = React.useState(localStorage.getItem('userRole'));
   const [colorChoice, updateColorChoice] = React.useState(localStorage.getItem('colorChoice'));
@@ -134,7 +134,7 @@ const Name = ({ settingsAreVisible, updateSettingsAreVisible, socketRef }) => {
   );
 };
 
-export default Name;
+export default Settings;
 
 function getRandomColor() {
   var color = '#';
